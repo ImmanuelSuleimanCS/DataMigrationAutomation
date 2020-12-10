@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # # INTRODUCTION
 #     # Use pandas to automate data migration and report creation
 #     # You work for a company that has offices in different cities across the us
@@ -28,7 +25,7 @@
 # # PART ONE
 # ## IMPORT STATEMENTS AND READING IN MULTIPLE FILES
 
-# In[ ]:
+
 
 
 import pandas as pd
@@ -41,14 +38,14 @@ import calendar
 Start=datetime.datetime.now()
 
 
-# In[ ]:
+
 
 
 BasePath=os.getcwd()
 BasePath
 
 
-# In[ ]:
+
 
 
 def Dir(name):
@@ -57,7 +54,7 @@ def Dir(name):
     return path
 
 
-# In[ ]:
+
 
 
 def GetFiles(path,ext):
@@ -66,19 +63,19 @@ def GetFiles(path,ext):
     return df
 
 
-# In[ ]:
+
 
 
 df=GetFiles("Sales Data",".txt")
 
 
-# In[ ]:
+
 
 
 df
 
 
-# In[ ]:
+
 
 
 refFile=f"{BasePath}\City-Region Ref.xlsx"
@@ -89,7 +86,7 @@ City,Manager,Rep=[Ref[tab] for tab in Ref]
 # # PART TWO
 # ## GROOM AND MERGE DATA WITH REF TABLES
 
-# In[ ]:
+
 
 
 def CityState(df):
@@ -100,7 +97,7 @@ def CityState(df):
 df["City"]=df.apply(CityState, axis=1)
 
 
-# In[ ]:
+
 
 
 City=City.apply(lambda x:x.astype(str).str.upper())
@@ -108,7 +105,7 @@ Manager=Manager.apply(lambda x:x.astype(str).str.upper())
 Rep=Rep.apply(lambda x:x.astype(str).str.upper())
 
 
-# In[ ]:
+
 
 
 def OuterJoin(df1,df2,index1,index2):
@@ -119,7 +116,7 @@ def OuterJoin(df1,df2,index1,index2):
     return DF
 
 
-# In[ ]:
+
 
 
 df=OuterJoin(df,City,"City","City")
@@ -127,7 +124,7 @@ df=OuterJoin(df,Manager,"Region","Region")
 df=OuterJoin(df,Rep,"City","City")
 
 
-# In[ ]:
+
 
 
 def ConvertNum(value):
@@ -136,20 +133,20 @@ def ConvertNum(value):
     return value
 
 
-# In[ ]:
+
 
 
 df["Investment"]=df['Investment'].apply(ConvertNum)
 df["Revenue"]=df['Revenue'].apply(ConvertNum)
 
 
-# In[ ]:
+
 
 
 df["Date"]=pd.to_datetime(df["Date"])
 
 
-# In[ ]:
+
 
 
 df["year"]=df["Date"].apply(lambda x:x.year)
@@ -157,14 +154,14 @@ df["month"]=df["Date"].apply(lambda x:x.month)
 df["quarter"]=df["Date"].apply(lambda x:x.quarter)
 
 
-# In[ ]:
+
 
 
 df["Net"]=df["Revenue"]-df["Investment"]
 df["Net"]=df["Net"].round(3)
 
 
-# In[ ]:
+
 
 
 def ROI(df):
@@ -173,7 +170,7 @@ def ROI(df):
 df["ROI"]=df.apply(ROI, axis=1)
 
 
-# In[ ]:
+
 
 
 df["Profit/Loss"]=df["ROI"].apply(lambda x:"Profit" if x > 0 else "Loss")
@@ -182,7 +179,7 @@ df["Profit/Loss"]=df["ROI"].apply(lambda x:"Profit" if x > 0 else "Loss")
 # # PART THREE
 # ## DEFINE HEATMAP AND SUMMARY FUNCTIONS
 
-# In[ ]:
+
 
 
 def HeatMap(df,indexes,columns,value=None, axis=None):
@@ -193,7 +190,7 @@ def HeatMap(df,indexes,columns,value=None, axis=None):
     return Heatmap
 
 
-# In[ ]:
+
 
 
 yearRegion=HeatMap(df,["year"],["Region"],value="ROI",axis=1)
@@ -202,7 +199,7 @@ yearMonth=HeatMap(df,["year"],["month"],value="ROI",axis=1)
 cityYear=HeatMap(df,["City"],["year"],value="ROI",axis=0)
 
 
-# In[ ]:
+
 
 
 def GetSummary(subtype=None):
@@ -233,7 +230,7 @@ def GetSummary(subtype=None):
 # # PART FOUR
 # ## DEFINE FUNCTIONS TO INSERT TABLES AND CHARTS
 
-# In[ ]:
+
 
 
 def InsertTable(dictionary,writer,title):
@@ -247,7 +244,7 @@ def InsertTable(dictionary,writer,title):
         row=(row+sLen+2)
 
 
-# In[ ]:
+
 
 
 # https://pandas-xlsxwriter-charts.readthedocs.io/introduction.html
@@ -297,7 +294,7 @@ def InsertCharts(dictionary,worksheet,workbook,sheet_name):
 # # PART FIVE
 # ## DEFINE FUNCTIONS TO SAVE DATA TO EXCEL FILE
 
-# In[ ]:
+
 
 
 def SaveData(dList,savePath):
@@ -326,7 +323,7 @@ def SaveData(dList,savePath):
 # # PART SIX
 # ## DEFINE FUNCTION TO SAVE RECORDS TO JSON FILES
 
-# In[ ]:
+
 
 
 exportcolumns=['City', 'Region', 'State', 'Investment',
@@ -349,13 +346,13 @@ for x in df["year"].unique():
                 year[str(x)]=manager
 
 
-# In[ ]:
+
 
 
 DF=pd.DataFrame(year.items(), columns=["Year","Regional Manager"])
 
 
-# In[ ]:
+
 
 
 def SaveToJson(df,destination):
@@ -370,7 +367,7 @@ def SaveToJson(df,destination):
 
 # ## CALL FUNCTIONS TO SAVE CHARTS/TABLES TO FILE
 
-# In[ ]:
+
 
 
 dList=[GetSummary(subtype="A"),GetSummary(subtype="B"),
@@ -380,27 +377,28 @@ SaveData(dList,Dir("Output-ROI"))
 
 # ## CALL FUNCTION TO SAVE RECORDS TO JSON FILES
 
-# In[ ]:
+
 
 
 SaveToJson(DF,Dir("Output-Json"))
 
 
-# In[ ]:
+
 
 
 End=datetime.datetime.now()
 
 
-# In[ ]:
+
 
 
 print(f"{End-Start}")
 
 
-# In[ ]:
+
 
 
 print(totalRows)
 df.shape[0]
+
 
